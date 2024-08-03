@@ -4,11 +4,10 @@ import 'https://cdn.jsdelivr.net/npm/jspanel4@4.12.0/es6module/jspanel.min.js';
 import { Point } from 'ol/geom';
 import Feature from 'ol/Feature';
 import { Icon, Style } from 'ol/style';
-import { view, source, map } from './main.js';
+import { source, map } from './main.js';
 import { Pointer as PointerInteraction } from 'ol/interaction.js';
 import toastr from 'toastr';
 import 'toastr/build/toastr.min.css';
-import WKT from 'ol/format/WKT.js';
 import { addModifyInteraction } from './main.js';
 
 
@@ -169,13 +168,11 @@ document.getElementById('query-btn').addEventListener('click', () => {
                             // event.stopPropagation();
                         });
 
-                        item.querySelector('.otoedit-btn').addEventListener('click', (event) => {
-                            event.stopPropagation();
-                        })
 
                         item.querySelector('.otoedit-btn').addEventListener('click', (event) => {
+                            const polygon = data.responseData[index];
                             event.stopPropagation();
-                            addModifyInteraction();
+                            addModifyInteraction(polygon);
                         });
 
                         /*item.querySelector('.otoedit-btn').addEventListener('click', (event) => {

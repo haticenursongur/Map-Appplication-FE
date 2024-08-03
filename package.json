@@ -1,5 +1,5 @@
 {
-  "name": "Map-Appplication-FE",
+  "name": "map-appplication-fe",
   "version": "1.0.0",
   "scripts": {
     "start": "vite",

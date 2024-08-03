@@ -15,6 +15,7 @@ import toastr from 'toastr';
 import './query.js';
 import WKT from 'ol/format/WKT.js';
 import Modify from 'ol/interaction/Modify.js';
+import { updateData } from './api.js';
 
 const format = new WKT();
 
@@ -83,7 +84,7 @@ function loadPoints() {
 
           feature.set("id", element.id)
 
-           if(element.wkt.includes("POINT")){
+          if (element.wkt.includes("POINT")) {
             const pointStyle = new Style({
               image: new Icon({
                 anchor: [0.5, 46],
@@ -95,8 +96,8 @@ function loadPoints() {
               }),
             });
             feature.setStyle(pointStyle);
-            
-           }
+
+          }
 
           source.addFeature(feature);
         });
@@ -132,26 +133,25 @@ export function addDrawInteraction(type) {
   });
 }
 
-export function addModifyInteraction() {
+export function addModifyInteraction(polygon) {
   if (modify) {
     map.removeInteraction(modify);
   }
   modify = new Modify({ source: source });
   map.addInteraction(modify);
 
+  map.once('singleclick', function () {
+    const wktStrings = Array.from(modifiedFeatures).map(feature => format.writeFeature(feature));
+    OtoeditPanel(wktStrings.join('\n'), "Polygon", polygon);
+  });
+
   modify.on('modifyend', function (event) {
     event.features.forEach(function (feature) {
       modifiedFeatures.add(feature);
     });
-
-    map.once('singleclick', function () {
-      const wktStrings = Array.from(modifiedFeatures).map(feature => format.writeFeature(feature));
-      showPanel(wktStrings.join('\n'));
-      modifiedFeatures.clear();
-      });
-    });
-    modifiedFeatures.forEach(function (feature) {
-      source.removeFeature(feature);
+  });
+  modifiedFeatures.forEach(function (feature) {
+    source.removeFeature(feature);
   });
 }
 
@@ -202,13 +202,78 @@ function showPanel(wkt, type) {
         } catch (error) {
           console.error('Error saving data:', error);
           toastr.error('Failed to save data');
-        }finally{
+        } finally {
           loadPoints()
         }
       });
     }
   });
 }
+
+function OtoeditPanel(wkt, type, polygon) {
+  const wktPanel = jsPanel.create({
+    headerTitle: 'Add ' + type,
+    content: `
+      <form id="coordinateForm">
+        <label for="coordinates">Coordinates (WKT):</label>
+        <textarea id="coordinates" name="coordinates" rows="4" cols="50" readonly>${wkt}</textarea>
+        <br>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required value="${polygon.name}"></input>
+        <br>
+        <button type="submit">Submit</button>
+      </form>
+    `,
+    callback: (panel) => {
+      const form = panel.querySelector('#coordinateForm');
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const name = form.name.value;
+
+        const updatepolygon = { wkt, name, id:  polygon?.id};
+
+        // Debugging: Log the updatepolygon object
+        console.log('Updating polygon with data:', updatepolygon);
+
+        try {
+          const result = await updateData(updatepolygon);
+          console.log('Data update:', result);
+          toastr.success('Data updated successfully!');
+
+          const feature = format.readFeature(wkt, {
+            dataProjection: 'EPSG:4326',
+            featureProjection: 'EPSG:3857',
+          });
+
+          const vectorSource = new VectorSource({
+            features: [feature],
+          });
+
+          const vectorLayer = new VectorLayer({
+            source: vectorSource,
+          });
+
+          map.addLayer(vectorLayer);
+
+          const features = source.getFeatures();
+          const oldFeature = features.find(feature => feature.get('name') === name);
+          if (oldFeature) {
+            source.removeFeature(oldFeature);
+          }
+
+          wktPanel.close();
+        } catch (error) {
+          console.error('Error updating data:', error);
+          toastr.error('Failed to update data');
+        } finally {
+          //loadPoints();
+          window.location.reload();
+        }
+      });
+    }
+  });
+}
+
 
 function stopInteraction() {
   if (draw) {
