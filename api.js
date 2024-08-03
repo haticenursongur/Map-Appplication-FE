@@ -52,14 +52,14 @@ export async function deleteData(id) {
   }
 }
 
-export async function updateData(point) {
+export async function updateData(updatepolygon) {
   try {
     const response = await fetch('https://localhost:7021/api/MapApi1/UpdatePoint', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(point),
+      body: JSON.stringify(updatepolygon),
     });
 
     if (!response.ok) {
