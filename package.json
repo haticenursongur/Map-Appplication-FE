@@ -1,0 +1,17 @@
+{
+  "name": "my-app",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.3.3"
+  },
+  "dependencies": {
+    "jspanel4": "^4.16.1",
+    "ol": "latest",
+    "toastr": "^2.1.4"
+  }
+}
