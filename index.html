@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/x-icon" href="https://openlayers.org/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Türkiye Haritası</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspanel4@4.14.0/dist/jspanel.min.css">
+  <link rel="stylesheet" href="node_modules/toastr/build/toastr.min.css">
+  <link rel="stylesheet" href="node_modules/ol/ol.css">
+  <style>
+    .map {
+      width: 100%;
+      height: 400px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map" class="map"></div>
+  <div id="popup" class="ol-popup"></div>
+  <nav>
+    <ul class="navbar">
+      <li><button id="query-btn">Query</button></li>
+      <li><button id="draw-point-btn" >Draw Point</button>
+        <option value="Point"></option></li>
+      <li><button id="draw-polygon-btn">Draw Polygon</button>
+        <option value="Polygon"></option></li>
+      <li><button id="stop-draw-btn">Stop Draw Point</button></li>
+    </ul>
+  </nav>
+
+
+  <script type="module" src="main.js"></script>
+  <script src="node_modules/toastr/build/toastr.min.js"></script>
+
+</body>
+
+</html>
